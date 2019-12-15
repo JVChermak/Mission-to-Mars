@@ -22,7 +22,28 @@ def scrape():
     mars = mongo.db.mars
     mars_data = scraping.scrape_all()
     mars.update({}, mars_data, upsert=True)
-    return "Scraping Successful!"
+    return render_template("scrape.html")
+
+# Add routes for hemisphere images
+@app.route("/img1")
+def img1():
+    mars = mongo.db.mars.find_one()
+    return render_template("img1.html", mars=mars)
+
+@app.route("/img2")
+def img2():
+    mars = mongo.db.mars.find_one()
+    return render_template("img2.html", mars=mars)
+
+@app.route("/img3")
+def img3():
+    mars = mongo.db.mars.find_one()
+    return render_template("img3.html", mars=mars)
+
+@app.route("/img4")
+def img4():
+    mars = mongo.db.mars.find_one()
+    return render_template("img4.html", mars=mars)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

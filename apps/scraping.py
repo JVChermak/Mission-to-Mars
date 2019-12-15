@@ -59,10 +59,49 @@ def mars_facts():
     except BaseException:
         return None
     # Assign columns and set index of Data Frame
-    df.columns=['description', 'value']
-    df.set_index('description', inplace=True)
+    df.columns=['Description', 'Value']
+    df.set_index('Description', inplace=True)
     # Convert the DataFrame into html
     return df.to_html()
+
+# Hemisphere Images
+def mars_hemispheres(browser):
+    hemi_dict = {}
+    hemisphere_data = []
+    for x in range(0,4):
+        url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+        browser.visit(url)
+        # Optional delay for loading the page
+        browser.is_element_present_by_css("ul.item_list li.slide", wait_time=1)
+        
+        # Set up the HTML parser
+        html = browser.html
+        img_soup = BeautifulSoup(html, 'html.parser')
+        
+        # Find the links to see the full images and get titles
+        hemi_items = browser.find_link_by_partial_text('Hemisphere')
+        hemi_titles = img_soup.find_all('h3')
+        
+        # Select link for each hemisphere
+        hemi_items[x].click()
+
+        # Set up the HTML parser
+        html = browser.html
+        img_soup = BeautifulSoup(html, 'html.parser')
+        
+        # Find the relative image url
+        hemi_url_rel = img_soup.find('img', class_='wide-image').get('src')
+        # Use the base url to create an absolute url
+        hemi_url = f'https://astrogeology.usgs.gov{hemi_url_rel}'
+
+        # Store image url and title in dictionary hemi_dict
+        hemi_dict = {
+            'img_url': hemi_url,
+            'title': hemi_titles[x].text
+        }
+        hemisphere_data.append(hemi_dict)
+    browser.back()
+    return hemisphere_data
 
 def scrape_all():
     import datetime as dt
@@ -79,8 +118,10 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "hemisphere_data": mars_hemispheres(browser)
     }
+
     # Turn off automated browsing session
     browser.quit()
     return data
