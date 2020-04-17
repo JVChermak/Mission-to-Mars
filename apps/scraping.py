@@ -62,7 +62,7 @@ def mars_facts():
     df.columns=['Description', 'Value']
     df.set_index('Description', inplace=True)
     # Convert the DataFrame into html
-    return df.to_html()
+    return df.to_html(classes='table table-striped')
 
 # Hemisphere Images
 def mars_hemispheres(browser):
